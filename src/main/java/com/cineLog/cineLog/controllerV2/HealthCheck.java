@@ -1,4 +1,4 @@
-package com.cineLog.cineLog.controller;
+package com.cineLog.cineLog.controllerV2;
 
 
 import org.springframework.web.bind.annotation.GetMapping;

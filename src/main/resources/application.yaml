@@ -1,0 +1,14 @@
+spring:
+  application:
+  name: cineLog
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: cineLog
+
+
+logging:
+  level:
+    org:
+      springframework=DEBUG:

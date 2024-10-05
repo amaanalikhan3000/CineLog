@@ -1,16 +1,19 @@
 package com.cineLog.cineLog.entity;
 
-import com.cineLog.cineLog.controller.UserEntityController;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
-public class UserEntity extends UserEntityController {
+@Document(collection = "userEntity")
+public class UserEntity {
+    @Id
     private ObjectId userId;
     private String username;
     private String email;
@@ -20,4 +23,3 @@ public class UserEntity extends UserEntityController {
     private Date createdAt;
     private Date updatedAt;
 }
-

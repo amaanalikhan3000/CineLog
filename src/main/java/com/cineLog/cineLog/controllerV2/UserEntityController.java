@@ -4,9 +4,12 @@ import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.service.UserEntryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -16,40 +19,53 @@ public class UserEntityController {
     private UserEntryService userEntryService;
 
     @GetMapping
-    public List<UserEntity> getAll() {
-        return userEntryService.getAll();
+    public ResponseEntity<List<UserEntity>> getAll() {
+        List<UserEntity> users = userEntryService.getAll();
+        if (users != null && !users.isEmpty()) {
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("id/{myId}")
-    public UserEntity getEntryById(@PathVariable ObjectId myId) {
-        return userEntryService.findById(myId).orElse(null);
+    public ResponseEntity<UserEntity> getEntryById(@PathVariable ObjectId myId) {
+        Optional<UserEntity> userEntity = userEntryService.findById(myId);
+        return userEntity.map(entity -> new ResponseEntity<>(entity, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public boolean createEntry(@RequestBody UserEntity userEntity) {
+    public ResponseEntity<UserEntity> createEntry(@RequestBody UserEntity userEntity) {
         userEntryService.saveEntry(userEntity);
-        return true;
+        return new ResponseEntity<>(userEntity, HttpStatus.CREATED);
     }
 
     @DeleteMapping("id/{myId}")
-    public boolean deleteById(@PathVariable ObjectId myId) {
-        userEntryService.deleteById(myId);
-        return true;
+    public ResponseEntity<Void> deleteById(@PathVariable ObjectId myId) {
+        Optional<UserEntity> userEntity = userEntryService.findById(myId);
+        if (userEntity.isPresent()) {
+            userEntryService.deleteById(myId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("id/{myId}")
-    public UserEntity updateById(@PathVariable ObjectId myId, @RequestBody UserEntity newEntry) {
-        UserEntity old = userEntryService.findById(myId).orElse(null);
-        if (old != null) {
-            old.setUsername(newEntry.getUsername() != null && !newEntry.getUsername().isEmpty() ? newEntry.getUsername() : old.getUsername());
-            old.setEmail(newEntry.getEmail() != null && !newEntry.getEmail().isEmpty() ? newEntry.getEmail() : old.getEmail());
-            old.setProfilepic(newEntry.getProfilepic() != null && !newEntry.getProfilepic().isEmpty() ? newEntry.getProfilepic() : old.getProfilepic());
-            old.setFavorites(newEntry.getFavorites() != null && !newEntry.getFavorites().isEmpty() ? newEntry.getFavorites() : old.getFavorites());
-            old.setWatchlist(newEntry.getWatchlist() != null && !newEntry.getWatchlist().isEmpty() ? newEntry.getWatchlist() : old.getWatchlist());
-            old.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : old.getCreatedAt());
-            old.setUpdatedAt(newEntry.getUpdatedAt() != null ? newEntry.getUpdatedAt() : old.getUpdatedAt());
+    public ResponseEntity<UserEntity> updateById(@PathVariable ObjectId myId, @RequestBody UserEntity newEntry) {
+        Optional<UserEntity> oldUserOptional = userEntryService.findById(myId);
+        if (oldUserOptional.isPresent()) {
+            UserEntity oldUser = oldUserOptional.get();
+            oldUser.setUsername(newEntry.getUsername() != null && !newEntry.getUsername().isEmpty() ? newEntry.getUsername() : oldUser.getUsername());
+            oldUser.setEmail(newEntry.getEmail() != null && !newEntry.getEmail().isEmpty() ? newEntry.getEmail() : oldUser.getEmail());
+            oldUser.setProfilepic(newEntry.getProfilepic() != null && !newEntry.getProfilepic().isEmpty() ? newEntry.getProfilepic() : oldUser.getProfilepic());
+            oldUser.setFavorites(newEntry.getFavorites() != null && !newEntry.getFavorites().isEmpty() ? newEntry.getFavorites() : oldUser.getFavorites());
+            oldUser.setWatchlist(newEntry.getWatchlist() != null && !newEntry.getWatchlist().isEmpty() ? newEntry.getWatchlist() : oldUser.getWatchlist());
+            oldUser.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : oldUser.getCreatedAt());
+            oldUser.setUpdatedAt(newEntry.getUpdatedAt() != null ? newEntry.getUpdatedAt() : oldUser.getUpdatedAt());
+
+            userEntryService.saveEntry(oldUser);
+            return new ResponseEntity<>(oldUser, HttpStatus.OK);
         }
-        userEntryService.saveEntry(old);
-        return old;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

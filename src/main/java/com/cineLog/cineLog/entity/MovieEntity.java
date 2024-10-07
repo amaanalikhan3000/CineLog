@@ -1,7 +1,7 @@
 package com.cineLog.cineLog.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,8 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Document(collection = "moviesEntities")
-@Getter
-@Setter
+@Data
 public class MovieEntity {
     @Id
     private ObjectId id;

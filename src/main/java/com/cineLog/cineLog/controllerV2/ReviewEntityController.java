@@ -37,7 +37,6 @@ public class ReviewEntityController {
 
     @PostMapping
     public ResponseEntity<ReviewEntity> createEntry(@RequestBody ReviewEntity reviewEntity) {
-        reviewEntity.setCreatedAt(LocalDateTime.now());
         reviewEntryService.saveEntry(reviewEntity);
         return new ResponseEntity<>(reviewEntity, HttpStatus.CREATED);
     }

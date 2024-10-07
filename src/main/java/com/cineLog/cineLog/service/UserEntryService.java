@@ -24,6 +24,10 @@ public class UserEntryService {
         return userEntityRepo.findById(userId);
     }
 
+    public Optional<UserEntity> findByusername(String username){
+        return userEntityRepo.findByusername(username);
+    }
+
     public void saveEntry(UserEntity userEntity) {
         userEntityRepo.save(userEntity);
     }

@@ -1,15 +1,14 @@
 package com.cineLog.cineLog.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
 @Document(collection = "reviewEntity")
 public class ReviewEntity {
 

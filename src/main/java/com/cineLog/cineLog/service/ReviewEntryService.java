@@ -9,6 +9,7 @@ import com.cineLog.cineLog.repository.ReviewEntityRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ public class ReviewEntryService {
         return reviewEntityRepo.findById(id);
     }
     public void saveEntry(ReviewEntity reviewEntity) {
+        reviewEntity.setCreatedAt(LocalDateTime.now());
         reviewEntityRepo.save(reviewEntity);
     }
 

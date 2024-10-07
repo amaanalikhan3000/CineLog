@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface UserEntityRepo extends MongoRepository<UserEntity, ObjectId> {
     Optional<UserEntity> findById(ObjectId userId);
-
+    Optional<UserEntity> findByusername(String username);
     void deleteById(ObjectId userId);
 }

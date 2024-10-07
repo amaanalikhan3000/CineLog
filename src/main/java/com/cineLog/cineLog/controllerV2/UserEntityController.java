@@ -62,10 +62,35 @@ public class UserEntityController {
             oldUser.setWatchlist(newEntry.getWatchlist() != null && !newEntry.getWatchlist().isEmpty() ? newEntry.getWatchlist() : oldUser.getWatchlist());
             oldUser.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : oldUser.getCreatedAt());
             oldUser.setUpdatedAt(newEntry.getUpdatedAt() != null ? newEntry.getUpdatedAt() : oldUser.getUpdatedAt());
-
+            oldUser.setPassword(newEntry.getPassword()!=null ? newEntry.getPassword():oldUser.getPassword());
             userEntryService.saveEntry(oldUser);
             return new ResponseEntity<>(oldUser, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
+
+    @PutMapping("userName/{username}")
+    public ResponseEntity<UserEntity> updateById(@PathVariable String  username, @RequestBody UserEntity newEntry) {
+        Optional<UserEntity> oldUserOptional = userEntryService.findByusername(username);
+        if (oldUserOptional.isPresent()) {
+            UserEntity oldUser = oldUserOptional.get();
+            oldUser.setUsername(newEntry.getUsername() != null && !newEntry.getUsername().isEmpty() ? newEntry.getUsername() : oldUser.getUsername());
+            oldUser.setEmail(newEntry.getEmail() != null && !newEntry.getEmail().isEmpty() ? newEntry.getEmail() : oldUser.getEmail());
+            oldUser.setProfilepic(newEntry.getProfilepic() != null && !newEntry.getProfilepic().isEmpty() ? newEntry.getProfilepic() : oldUser.getProfilepic());
+            oldUser.setFavorites(newEntry.getFavorites() != null && !newEntry.getFavorites().isEmpty() ? newEntry.getFavorites() : oldUser.getFavorites());
+            oldUser.setWatchlist(newEntry.getWatchlist() != null && !newEntry.getWatchlist().isEmpty() ? newEntry.getWatchlist() : oldUser.getWatchlist());
+            oldUser.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : oldUser.getCreatedAt());
+            oldUser.setUpdatedAt(newEntry.getUpdatedAt() != null ? newEntry.getUpdatedAt() : oldUser.getUpdatedAt());
+            oldUser.setPassword(newEntry.getPassword()!=null ? newEntry.getPassword():oldUser.getPassword());
+            userEntryService.saveEntry(oldUser);
+            return new ResponseEntity<>(oldUser, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
+
+
 }

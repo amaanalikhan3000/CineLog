@@ -19,12 +19,18 @@ public class UserEntityController {
     private UserEntryService userEntryService;
 
     @GetMapping
-    public ResponseEntity<List<UserEntity>> getAll() {
+    public ResponseEntity<?> getAll() {
         List<UserEntity> users = userEntryService.getAll();
         if (users != null && !users.isEmpty()) {
             return new ResponseEntity<>(users, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserEntity> createEntry(@RequestBody UserEntity userEntity) {
+        userEntryService.saveEntry(userEntity);
+        return new ResponseEntity<>(userEntity, HttpStatus.CREATED);
     }
 
     @GetMapping("id/{myId}")
@@ -34,11 +40,7 @@ public class UserEntityController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
-    public ResponseEntity<UserEntity> createEntry(@RequestBody UserEntity userEntity) {
-        userEntryService.saveEntry(userEntity);
-        return new ResponseEntity<>(userEntity, HttpStatus.CREATED);
-    }
+
 
     @DeleteMapping("id/{myId}")
     public ResponseEntity<Void> deleteById(@PathVariable ObjectId myId) {
@@ -73,7 +75,7 @@ public class UserEntityController {
 
     @PutMapping("userName/{username}")
     public ResponseEntity<UserEntity> updateById(@PathVariable String  username, @RequestBody UserEntity newEntry) {
-        Optional<UserEntity> oldUserOptional = userEntryService.findByusername(username);
+        Optional<UserEntity> oldUserOptional = Optional.ofNullable(userEntryService.findByusername(username));
         if (oldUserOptional.isPresent()) {
             UserEntity oldUser = oldUserOptional.get();
             oldUser.setUsername(newEntry.getUsername() != null && !newEntry.getUsername().isEmpty() ? newEntry.getUsername() : oldUser.getUsername());
@@ -88,6 +90,22 @@ public class UserEntityController {
             return new ResponseEntity<>(oldUser, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+
+    }
+
+
+    @PutMapping("/{username}")
+    public ResponseEntity<?> updateUser(@RequestBody UserEntity userEntity, @PathVariable String username){
+
+        UserEntity userInDb = userEntryService.findByusername(userEntity.getUsername());
+        if(userInDb!=null){
+            userInDb.setUsername(userEntity.getUsername());
+            userInDb.setPassword(userEntity.getPassword());
+            userEntryService.saveEntry(userInDb);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 

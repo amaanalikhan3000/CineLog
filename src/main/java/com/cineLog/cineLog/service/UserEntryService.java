@@ -4,7 +4,6 @@ import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.repository.UserEntityRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +15,11 @@ public class UserEntryService {
     @Autowired
     private UserEntityRepo userEntityRepo;
 
+    public void saveEntry(UserEntity userEntity) {
+        userEntityRepo.save(userEntity);
+    }
+
+
     public List<UserEntity> getAll(){
         return userEntityRepo.findAll();
     }
@@ -24,13 +28,10 @@ public class UserEntryService {
         return userEntityRepo.findById(userId);
     }
 
-    public Optional<UserEntity> findByusername(String username){
+    public UserEntity findByusername(String username){
         return userEntityRepo.findByusername(username);
     }
 
-    public void saveEntry(UserEntity userEntity) {
-        userEntityRepo.save(userEntity);
-    }
 
     public void deleteById(ObjectId userId) {
         userEntityRepo.deleteById(userId);

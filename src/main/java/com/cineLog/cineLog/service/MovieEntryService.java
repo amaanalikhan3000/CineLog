@@ -24,7 +24,7 @@ public class MovieEntryService {
         return movieEntryRepo.findAll();
     }
 
-    public Optional<MovieEntity> findById(ObjectId id) {
+    public Optional<MovieEntity> findById(String id) {
         return movieEntryRepo.findById(id);
     }
 

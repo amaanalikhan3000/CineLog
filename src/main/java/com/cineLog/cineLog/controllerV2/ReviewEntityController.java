@@ -1,7 +1,9 @@
 package com.cineLog.cineLog.controllerV2;
 
+import com.cineLog.cineLog.entity.MovieEntity;
 import com.cineLog.cineLog.entity.ReviewEntity;
 import com.cineLog.cineLog.entity.UserEntity;
+import com.cineLog.cineLog.service.MovieEntryService;
 import com.cineLog.cineLog.service.ReviewEntryService;
 import com.cineLog.cineLog.service.UserEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,10 @@ public class ReviewEntityController {
     @Autowired
     private UserEntryService userEntryService;
 
+
+    @Autowired
+    private MovieEntryService movieEntryService;
+
     @GetMapping("{username}")
     public ResponseEntity<?> getAllReviewsOfUser(@PathVariable String username) {
         UserEntity user = userEntryService.findByusername(username);
@@ -33,6 +39,30 @@ public class ReviewEntityController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<?> getAllReviewsByMovie(@PathVariable String movieId) {
+        // Fetch reviews by movieId
+        List<ReviewEntity> reviews = reviewEntryService.findByMovieId(movieId);
+        if (!reviews.isEmpty()) {
+            return new ResponseEntity<>(reviews, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
+    @PostMapping("/movie/{movieId}")
+    public ResponseEntity<ReviewEntity> createReviewForMovie(
+            @RequestBody ReviewEntity reviewEntity,
+            @PathVariable String movieId) {
+
+        reviewEntity.setMovieId(movieId);
+        reviewEntryService.saveEntry(reviewEntity);
+        return new ResponseEntity<>(reviewEntity, HttpStatus.CREATED);
+    }
+
+
 
     @PostMapping("{username}")
     public ResponseEntity<ReviewEntity> createEntry(@RequestBody ReviewEntity reviewEntity, @PathVariable String username) {

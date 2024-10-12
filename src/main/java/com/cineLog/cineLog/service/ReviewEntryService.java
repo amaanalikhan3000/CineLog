@@ -11,6 +11,7 @@ import com.cineLog.cineLog.repository.UserEntityRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -41,30 +42,9 @@ public class ReviewEntryService {
     }
 
 
+
     public void saveEntry(ReviewEntity reviewEntity, String username) {
         // Fetch the user by username
-//        UserEntity user = userEntryService.findByusername(username);
-//
-//        // If user is found, proceed
-//        if (user != null) {
-//            // Set timestamps and save the review
-//            reviewEntity.setCreatedAt(LocalDateTime.now());
-//            ReviewEntity saved = reviewEntityRepo.save(reviewEntity);
-//
-//            // Initialize the reviewEntities list if null
-//            if (user.getReviewEntities() == null) {
-//                user.setReviewEntities(new ArrayList<>()); // Initialize list if it's null
-//            }
-//
-//            // Add the saved review to the user's reviewEntities
-//            user.getReviewEntities().add(saved);
-//
-//            // Save the user with the updated review list
-//            userEntryService.saveEntry(user);
-//        } else {
-//            throw new IllegalArgumentException("User not found with username: " + username);
-//        }
-
         UserEntity user = userEntryService.findByusername(username);
         reviewEntity.setCreatedAt(LocalDateTime.now());
         ReviewEntity saved = reviewEntityRepo.save(reviewEntity);

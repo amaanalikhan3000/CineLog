@@ -39,4 +39,47 @@ public class UserEntryService {
 
 
 
+
+    /*
+        A user can have many favorite movies, and a movie can be favorited by many users.
+     */
+
+    public void addToFavorites(ObjectId userId, String movieId) {
+        UserEntity user = findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (!user.getFavorites().contains(movieId)) {
+            user.getFavorites().add(movieId);
+            saveEntry(user);
+        } else {
+            throw new RuntimeException("Movie already in favorites");
+        }
+    }
+
+    public void addTowatchList(ObjectId userId, String movieId) {
+        UserEntity user = findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (!user.getWatchlist().contains(movieId)) {
+            user.getWatchlist().add(movieId);
+            saveEntry(user);
+        } else {
+            throw new RuntimeException("Movie already in watchlist");
+        }
+    }
+
+    public void removeFromFavorites(ObjectId userId,String movieId){
+        UserEntity user = findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if(user.getFavorites().remove(movieId)){
+            saveEntry(user);
+        }else{
+            throw new RuntimeException("Movie not found in favorites");
+        }
+
+    }
+
+    public void removeFromWatchlist(ObjectId userId, String movieId) {
+        UserEntity user = findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if(user.getWatchlist().remove(movieId)){
+            saveEntry(user);
+        }else{
+            throw new RuntimeException("Movie not found in favorites");
+        }
+    }
 }

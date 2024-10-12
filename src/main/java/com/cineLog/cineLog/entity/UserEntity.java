@@ -16,7 +16,7 @@
 
     @Data
     @Document(collection = "userEntity")
-
+    @NoArgsConstructor
     public class UserEntity {
         @Id
         private ObjectId userId;
@@ -29,11 +29,13 @@
         private String password;
         private String email;
         private String profilepic;
-        private List<String> favorites;
-        private List<String> watchlist;
+        private List<String> favorites = new ArrayList<>();
+        private List<String> watchlist = new ArrayList<>();
         private Date createdAt;
         private Date updatedAt;
 
         @DBRef
         private List<ReviewEntity> reviewEntities = new ArrayList<>();
+
+
     }

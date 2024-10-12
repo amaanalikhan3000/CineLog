@@ -109,6 +109,70 @@ public class UserEntityController {
     }
 
 
+    /*
+        Many to many relationship
+        A user can have many favorite movies, and a movie can be favorited by many users.
+
+     */
+
+    @PostMapping("/{userId}/favorites/{movieId}")
+    public ResponseEntity<?> addToFavorites(@PathVariable ObjectId userId, @PathVariable String movieId) {
+        try {
+            userEntryService.addToFavorites(userId, movieId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{userId}/favorites/{movieId}")
+    public ResponseEntity<?> removeFromFavorites(@PathVariable ObjectId userId, @PathVariable String movieId) {
+        try {
+            userEntryService.removeFromFavorites(userId, movieId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/{userId}/favorites")
+    public ResponseEntity<?> getFavourites(@PathVariable ObjectId userId){
+        UserEntity user = userEntryService.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return new ResponseEntity<>(user.getFavorites(), HttpStatus.OK);
+    }
+
+
+    /*
+        A user can have multiple movies in their watchlist, and a movie can appear in the
+        watchlist of multiple users.
+     */
+
+    @PostMapping("/{userId}/watchlist/{movieId}")
+    public ResponseEntity<?> addToWatchlist(@PathVariable ObjectId userId, @PathVariable String movieId) {
+        try {
+            userEntryService.addTowatchList(userId, movieId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{userId}/watchlist/{movieId}")
+    public ResponseEntity<?> removeFromWatchlist(@PathVariable ObjectId userId, @PathVariable String movieId) {
+        try {
+            userEntryService.removeFromWatchlist(userId, movieId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/{userId}/watchList")
+    public ResponseEntity<?> getWatchlist(@PathVariable ObjectId userId){
+        UserEntity user = userEntryService.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return new ResponseEntity<>(user.getWatchlist(), HttpStatus.OK);
+    }
+
 
 
 }

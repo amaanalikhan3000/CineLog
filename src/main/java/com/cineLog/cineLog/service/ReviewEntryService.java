@@ -76,6 +76,10 @@ public class ReviewEntryService {
         reviewEntityRepo.save(reviewEntity);
     }
 
+    public List<ReviewEntity> findByMovieId(String movieId) {
+        return reviewEntityRepo.findByMovieId(movieId);
+    }
+
 
 
     public void deleteById(String id, String username) {

@@ -30,7 +30,7 @@ public class MovieEntityController {
 
     @GetMapping("id/{myId}")
     public ResponseEntity<?> getEntryById(@PathVariable ObjectId myId) {
-        Optional<MovieEntity> movieEntity = movieEntryService.findById(myId);
+        Optional<MovieEntity> movieEntity = movieEntryService.findById(String.valueOf(myId));
         if(movieEntity.isPresent()){
             return  new ResponseEntity<>(movieEntity, HttpStatus.OK);
         }
@@ -59,7 +59,7 @@ public class MovieEntityController {
 
     @PutMapping("id/{myId}")
     public ResponseEntity<?> updateById(@PathVariable ObjectId myId, @RequestBody MovieEntity newEntry) {
-        MovieEntity old = movieEntryService.findById(myId).orElse(null);
+        MovieEntity old = movieEntryService.findById(String.valueOf(myId)).orElse(null);
         if (old != null) {
             old.setGenres(newEntry.getGenres() != null && !newEntry.getGenres().isEmpty() ? newEntry.getGenres() : old.getGenres());
             old.setTags(newEntry.getTags() != null && !newEntry.getTags().isEmpty() ? newEntry.getTags() : old.getTags());

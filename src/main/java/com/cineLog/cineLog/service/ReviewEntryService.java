@@ -43,13 +43,20 @@ public class ReviewEntryService {
 
 
 
+    @Transactional
     public void saveEntry(ReviewEntity reviewEntity, String username) {
         // Fetch the user by username
-        UserEntity user = userEntryService.findByusername(username);
-        reviewEntity.setCreatedAt(LocalDateTime.now());
-        ReviewEntity saved = reviewEntityRepo.save(reviewEntity);
-        user.getReviewEntities().add(saved);
-        userEntryService.saveEntry(user);
+        try {
+            UserEntity user = userEntryService.findByusername(username);
+            reviewEntity.setCreatedAt(LocalDateTime.now());
+            ReviewEntity saved = reviewEntityRepo.save(reviewEntity);
+            user.getReviewEntities().add(saved);
+            userEntryService.saveEntry(user);
+        }catch (Exception e){
+         //   System.out.println(e);
+            throw new RuntimeException("An error occurred while saving",e);
+        }
+
     }
 
     public void saveEntry(ReviewEntity reviewEntity) {

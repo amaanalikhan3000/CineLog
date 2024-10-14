@@ -4,9 +4,12 @@ import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.repository.UserEntityRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +19,17 @@ public class UserEntryService {
     @Autowired
     private UserEntityRepo userEntityRepo;
 
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public void saveEntry(UserEntity userEntity) {
+        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setRoles(Arrays.asList("USER"));
         userEntityRepo.save(userEntity);
     }
+
+//    public void saveNewUser(UserEntity userEntity) {
+//        userEntityRepo.save(userEntity);
+//    }
 
 
     public List<UserEntity> getAll(){

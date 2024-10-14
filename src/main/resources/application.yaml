@@ -3,8 +3,8 @@ spring:
   name: cineLog
   data:
     mongodb:
-      host: localhost
-      port: 27017
+      uri: mongodb+srv://username:password@cluster0.r4qyc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
       database: cineLog
       auto-index-creation: true
 

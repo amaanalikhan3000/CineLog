@@ -37,5 +37,8 @@
         @DBRef
         private List<ReviewEntity> reviewEntities = new ArrayList<>();
 
+        // for what type of roles like admin , user etc
+        private List<String> roles;
+
 
     }

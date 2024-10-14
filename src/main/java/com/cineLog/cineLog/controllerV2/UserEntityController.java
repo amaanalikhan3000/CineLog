@@ -1,11 +1,14 @@
 package com.cineLog.cineLog.controllerV2;
 
 import com.cineLog.cineLog.entity.UserEntity;
+import com.cineLog.cineLog.repository.UserEntityRepo;
 import com.cineLog.cineLog.service.UserEntryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,9 @@ public class UserEntityController {
     @Autowired
     private UserEntryService userEntryService;
 
+    @Autowired
+    private UserEntityRepo userEntityRepo;
+
     @GetMapping
     public ResponseEntity<?> getAll() {
         List<UserEntity> users = userEntryService.getAll();
@@ -27,11 +33,6 @@ public class UserEntityController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<UserEntity> createEntry(@RequestBody UserEntity userEntity) {
-        userEntryService.saveEntry(userEntity);
-        return new ResponseEntity<>(userEntity, HttpStatus.CREATED);
-    }
 
     @GetMapping("id/{myId}")
     public ResponseEntity<UserEntity> getEntryById(@PathVariable ObjectId myId) {
@@ -96,15 +97,25 @@ public class UserEntityController {
     }
 
 
-    @PutMapping("/{username}")
-    public ResponseEntity<?> updateUser(@RequestBody UserEntity userEntity, @PathVariable String username){
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody UserEntity userEntity){
 
-        UserEntity userInDb = userEntryService.findByusername(userEntity.getUsername());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String userName = authentication.getName();
+        UserEntity userInDb = userEntryService.findByusername(userName);
         if(userInDb!=null){
             userInDb.setUsername(userEntity.getUsername());
             userInDb.setPassword(userEntity.getPassword());
             userEntryService.saveEntry(userInDb);
         }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteById2() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userEntityRepo.deleteByusername(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

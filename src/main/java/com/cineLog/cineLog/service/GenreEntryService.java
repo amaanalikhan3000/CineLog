@@ -1,6 +1,7 @@
 package com.cineLog.cineLog.service;
 
 import com.cineLog.cineLog.entity.GenreEntity;
+import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.repository.GenreEntryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,5 +34,8 @@ public class GenreEntryService {
     }
 
 
+    public GenreEntity findByname(String name){
+        return genreEntryRepo.findByname(name);
+    }
 
 }

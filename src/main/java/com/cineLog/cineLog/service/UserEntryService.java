@@ -27,9 +27,9 @@ public class UserEntryService {
         userEntityRepo.save(userEntity);
     }
 
-//    public void saveNewUser(UserEntity userEntity) {
-//        userEntityRepo.save(userEntity);
-//    }
+    public void saveNewUser(UserEntity userEntity) {
+        userEntityRepo.save(userEntity);
+    }
 
 
     public List<UserEntity> getAll(){

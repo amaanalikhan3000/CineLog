@@ -104,11 +104,9 @@ public class UserEntityController {
 
         String userName = authentication.getName();
         UserEntity userInDb = userEntryService.findByusername(userName);
-        if(userInDb!=null){
             userInDb.setUsername(userEntity.getUsername());
             userInDb.setPassword(userEntity.getPassword());
             userEntryService.saveEntry(userInDb);
-        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

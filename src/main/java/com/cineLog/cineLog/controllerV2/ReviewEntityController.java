@@ -1,6 +1,5 @@
 package com.cineLog.cineLog.controllerV2;
 
-import com.cineLog.cineLog.entity.MovieEntity;
 import com.cineLog.cineLog.entity.ReviewEntity;
 import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.service.MovieEntryService;
@@ -9,12 +8,15 @@ import com.cineLog.cineLog.service.UserEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/review")
@@ -30,9 +32,11 @@ public class ReviewEntityController {
     @Autowired
     private MovieEntryService movieEntryService;
 
-    @GetMapping("{username}")
-    public ResponseEntity<?> getAllReviewsOfUser(@PathVariable String username) {
-        UserEntity user = userEntryService.findByusername(username);
+    @GetMapping
+    public ResponseEntity<?> getAllReviewsOfUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        UserEntity user = userEntryService.findByusername(userName);
         List<ReviewEntity> all = user.getReviewEntities();
         if (all != null && !all.isEmpty()) {
             return new ResponseEntity<>(all, HttpStatus.OK);
@@ -58,18 +62,19 @@ public class ReviewEntityController {
             @PathVariable String movieId) {
 
         reviewEntity.setMovieId(movieId);
-        reviewEntryService.saveEntry(reviewEntity);
+        reviewEntryService.saveNewUser(reviewEntity);
         return new ResponseEntity<>(reviewEntity, HttpStatus.CREATED);
     }
 
 
-
-    @PostMapping("{username}")
-    public ResponseEntity<ReviewEntity> createEntry(@RequestBody ReviewEntity reviewEntity, @PathVariable String username) {
+    @PostMapping
+    public ResponseEntity<ReviewEntity> createEntry(@RequestBody ReviewEntity reviewEntity) {
         try {
 
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userName = authentication.getName();
 
-            reviewEntryService.saveEntry(reviewEntity,username);
+            reviewEntryService.saveNewUser(reviewEntity, userName);
             return new ResponseEntity<>(reviewEntity, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -79,67 +84,83 @@ public class ReviewEntityController {
 
     @GetMapping("id/{myId}")
     public ResponseEntity<?> getEntryById(@PathVariable String myId) {
-        Optional<ReviewEntity> reviewEntity = reviewEntryService.findById(myId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
 
-        if(reviewEntity.isPresent()){
-            return new ResponseEntity<>(reviewEntity, HttpStatus.OK);
+        UserEntity user = userEntryService.findByusername(userName);
+
+        List<ReviewEntity> collect = user.getReviewEntities()
+                    .stream()
+                    .filter(x -> x.getId()
+                            .equals(myId))
+                    .collect(Collectors.toList());
+
+        if (!collect.isEmpty()) {
+            Optional<ReviewEntity> reviewEntity = reviewEntryService.findById(myId);
+            if (reviewEntity.isPresent()) {
+                return new ResponseEntity<>(reviewEntity, HttpStatus.OK);
+            }
         }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
 
 
+    @DeleteMapping("id/{myId}")
+    public ResponseEntity<?> deleteById(@PathVariable String myId) {
 
-    @DeleteMapping("id/{username}/{myId}")
-    public ResponseEntity<?> deleteById(@PathVariable String myId,@PathVariable String username) {
-
-            reviewEntryService.deleteById(myId,username);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        boolean removedCheck = reviewEntryService.deleteById(myId, userName);
+        if(removedCheck){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
 
     }
 
-//    @PutMapping("id/{username}/{myId}")
-//    public ResponseEntity<ReviewEntity> updateById(
-//            @PathVariable String myId,
-//            @RequestBody ReviewEntity newEntry,
-//            @PathVariable String username
-//    ) {
-//        Optional<ReviewEntity> oldReviewOptional = reviewEntryService.findById(myId);
-//        if (oldReviewOptional.isPresent()) {
-//            ReviewEntity old = oldReviewOptional.get();
-//            old.setUserId(newEntry.getUserId() != null && !newEntry.getUserId().isEmpty() ? newEntry.getUserId() : old.getUserId());
-//            old.setMovieId(newEntry.getMovieId() != null && !newEntry.getMovieId().isEmpty() ? newEntry.getMovieId() : old.getMovieId());
-//            old.setRating(newEntry.getRating() != 0 ? newEntry.getRating() : old.getRating()); // Assuming rating is 0 if not updated
-//            old.setReview(newEntry.getReview() != null && !newEntry.getReview().isEmpty() ? newEntry.getReview() : old.getReview());
-//            old.setDateWatched(newEntry.getDateWatched() != null ? newEntry.getDateWatched() : old.getDateWatched());
-//            old.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : old.getCreatedAt());
-//            old.setUpdatedAt(LocalDateTime.now()); // Automatically update the 'updatedAt' field to the current time
-//
-//            reviewEntryService.saveEntry(old);
-//            return new ResponseEntity<>(old, HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
-
-    @PutMapping("id/{username}/{myId}")
+    @PutMapping("id/{myId}")
     public ResponseEntity<ReviewEntity> updateById(
             @PathVariable String myId,
-            @RequestBody ReviewEntity newEntry,
-            @PathVariable String username
+            @RequestBody ReviewEntity newEntry
     ) {
-        ReviewEntity old = reviewEntryService.findById(myId).orElse(null);
-        if (old!=null) {
-            old.setUserId(newEntry.getUserId() != null && !newEntry.getUserId().isEmpty() ? newEntry.getUserId() : old.getUserId());
-            old.setMovieId(newEntry.getMovieId() != null && !newEntry.getMovieId().isEmpty() ? newEntry.getMovieId() : old.getMovieId());
-            old.setRating(newEntry.getRating() != 0 ? newEntry.getRating() : old.getRating()); // Assuming rating is 0 if not updated
-            old.setReview(newEntry.getReview() != null && !newEntry.getReview().isEmpty() ? newEntry.getReview() : old.getReview());
-            old.setDateWatched(newEntry.getDateWatched() != null ? newEntry.getDateWatched() : old.getDateWatched());
-            old.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : old.getCreatedAt());
-            old.setUpdatedAt(LocalDateTime.now()); // Automatically update the 'updatedAt' field to the current time
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        UserEntity user = userEntryService.findByusername(userName);
 
-            reviewEntryService.saveEntry(old);
-            return new ResponseEntity<>(old, HttpStatus.OK);
+        List<ReviewEntity> collect = user.getReviewEntities()
+                .stream()
+                .filter(x -> x.getId()
+                        .equals(myId))
+                .collect(Collectors.toList());
+
+        if (!collect.isEmpty()) {
+            Optional<ReviewEntity> reviewEntity = reviewEntryService.findById(myId);
+            if (reviewEntity.isPresent()) {
+                ReviewEntity reviewEntity2 = reviewEntryService.findById(myId).orElse(null);
+
+                if (reviewEntity2 != null) {
+                    reviewEntity2.setUserId(newEntry.getUserId() != null && !newEntry.getUserId().isEmpty() ? newEntry.getUserId() : reviewEntity2.getUserId());
+                    reviewEntity2.setMovieId(newEntry.getMovieId() != null && !newEntry.getMovieId().isEmpty() ? newEntry.getMovieId() : reviewEntity2.getMovieId());
+                    reviewEntity2.setRating(newEntry.getRating() != 0 ? newEntry.getRating() : reviewEntity2.getRating()); // Assuming rating is 0 if not updated
+                    reviewEntity2.setReview(newEntry.getReview() != null && !newEntry.getReview().isEmpty() ? newEntry.getReview() : reviewEntity2.getReview());
+                    reviewEntity2.setDateWatched(newEntry.getDateWatched() != null ? newEntry.getDateWatched() : reviewEntity2.getDateWatched());
+                    reviewEntity2.setCreatedAt(newEntry.getCreatedAt() != null ? newEntry.getCreatedAt() : reviewEntity2.getCreatedAt());
+                    reviewEntity2.setUpdatedAt(LocalDateTime.now()); // Automatically update the 'updatedAt' field to the current time
+
+                    reviewEntryService.saveNewUser(reviewEntity2);
+                    return new ResponseEntity<>(reviewEntity2, HttpStatus.OK);
+                }
+
+            }
         }
+
+
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

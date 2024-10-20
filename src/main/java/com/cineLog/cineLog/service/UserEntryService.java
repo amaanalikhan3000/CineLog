@@ -4,6 +4,7 @@ import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.repository.UserEntityRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -118,5 +119,11 @@ public class UserEntryService {
         catch (Exception e){
             throw new RuntimeException("An error occurred while removing from watchlist",e);
         }
+    }
+
+    public void saveAdmin(UserEntity userEntity) {
+        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setRoles(Arrays.asList("USER","ADMIN"));
+        userEntityRepo.save(userEntity);
     }
 }

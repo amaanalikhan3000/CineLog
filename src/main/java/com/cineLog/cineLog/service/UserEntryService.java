@@ -22,14 +22,21 @@ public class UserEntryService {
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public void saveEntry(UserEntity userEntity) {
-        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-        userEntity.setRoles(Arrays.asList("USER"));
-        userEntityRepo.save(userEntity);
+    public boolean saveEntry(UserEntity userEntity) {
+        try {
+            userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+            userEntity.setRoles(Arrays.asList("USER"));
+            userEntityRepo.save(userEntity);
+        }catch (Exception e){
+            return false;
+        }
+        return true;
+
     }
 
-    public void saveNewUser(UserEntity userEntity) {
+    public boolean saveNewUser(UserEntity userEntity) {
         userEntityRepo.save(userEntity);
+        return true;
     }
 
 

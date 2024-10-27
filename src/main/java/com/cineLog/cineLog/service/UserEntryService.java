@@ -2,9 +2,9 @@ package com.cineLog.cineLog.service;
 
 import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.repository.UserEntityRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,11 +16,14 @@ import java.util.Optional;
 
 
 @Service
+@Slf4j
 public class UserEntryService {
     @Autowired
     private UserEntityRepo userEntityRepo;
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+//    private static final Logger logger = LoggerFactory.getLogger(UserEntryService.class);
 
     public boolean saveEntry(UserEntity userEntity) {
         try {
@@ -28,6 +31,11 @@ public class UserEntryService {
             userEntity.setRoles(Arrays.asList("USER"));
             userEntityRepo.save(userEntity);
         }catch (Exception e){
+            log.error("Error occurred for {}:",userEntity.getUsername(),e);
+            log.warn("hahahahaha");
+            log.info("hahahahaahha");
+            log.debug("okokokokok");
+            log.trace("okdudpdsj");
             return false;
         }
         return true;

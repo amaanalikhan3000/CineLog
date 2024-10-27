@@ -7,6 +7,8 @@ import com.cineLog.cineLog.repository.ReviewEntityRepo;
 
 import com.cineLog.cineLog.repository.UserEntityRepo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,8 @@ public class ReviewEntryService {
 
     @Autowired
     private UserEntryService userEntryService;
+
+    private static final Logger logger = LoggerFactory.getLogger(ReviewEntryService.class);
 
 
     public List<ReviewEntity> getAll() {
@@ -51,6 +55,7 @@ public class ReviewEntryService {
             userEntryService.saveNewUser(user);
         } catch (Exception e) {
             //   System.out.println(e);
+            logger.info("hello");
             throw new RuntimeException("An error occurred while saving", e);
         }
 

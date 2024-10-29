@@ -3,8 +3,12 @@ package com.cineLog.cineLog.service;
 
 import com.cineLog.cineLog.api.Response.WeatherResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,10 +21,25 @@ public class WeatherService {
     @Autowired
     private RestTemplate restTemplate;
 
+
+
     public WeatherResponse getWeather(String city){
+
+//        String requestBody = "{\n" +
+//            " \"username\":\"raj\",\n" +
+//                " \"password\":\"raj\"\n" +
+//              "}";
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("key","value");
+
+        UserDetails user = User.builder().username("raj").password("raj").build();
+
+
+        HttpEntity<UserDetails> httpEntity = new HttpEntity<>(user,httpHeaders);
         String finalAPI= API.replace("CITY",city).replace("API_KEY",apiKey);
 
-        ResponseEntity<WeatherResponse> response = restTemplate.exchange(finalAPI, HttpMethod.GET, null, WeatherResponse.class);
+        ResponseEntity<WeatherResponse> response = restTemplate.exchange(finalAPI, HttpMethod.POST, null, WeatherResponse.class);
 
         WeatherResponse body = response.getBody();
 

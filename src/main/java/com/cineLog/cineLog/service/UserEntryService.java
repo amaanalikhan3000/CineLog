@@ -28,7 +28,7 @@ public class UserEntryService {
     public boolean saveEntry(UserEntity userEntity) {
         try {
             userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-            userEntity.setRoles(Arrays.asList("USER"));
+            userEntity.setRoles(List.of("USER"));
             userEntityRepo.save(userEntity);
         }catch (Exception e){
             log.error("Error occurred for {}:",userEntity.getUsername(),e);

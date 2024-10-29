@@ -1,8 +1,10 @@
 package com.cineLog.cineLog.controllerV2;
 
+import com.cineLog.cineLog.api.Response.WeatherResponse;
 import com.cineLog.cineLog.entity.UserEntity;
 import com.cineLog.cineLog.repository.UserEntityRepo;
 import com.cineLog.cineLog.service.UserEntryService;
+import com.cineLog.cineLog.service.WeatherService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,9 @@ public class UserEntityController {
 
     @Autowired
     private UserEntityRepo userEntityRepo;
+
+    @Autowired
+    private WeatherService weatherService;
 
     @GetMapping
     public ResponseEntity<?> getAll() {
@@ -52,6 +57,10 @@ public class UserEntityController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
+
+
 
     @PutMapping("id/{myId}")
     public ResponseEntity<UserEntity> updateById(@PathVariable ObjectId myId, @RequestBody UserEntity newEntry) {
@@ -116,6 +125,24 @@ public class UserEntityController {
         userEntityRepo.deleteByusername(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+
+    @GetMapping("greetings")
+    public ResponseEntity<?> greeting() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse =  weatherService.getWeather("Mumbai");
+
+        String greeting="";
+
+        if(weatherResponse!=null){
+            greeting = "Weather feels like " + weatherResponse.getCurrent().getFeelsLike();
+        }
+
+        return new ResponseEntity<>("Hi "+ authentication.getName()+ greeting,HttpStatus.OK) ;
+    }
+
+
+
 
 
     /*
